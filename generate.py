@@ -117,9 +117,20 @@ def create_pdf_with_tables(df, file_name):
 if __name__ == "__main__":
     load_dotenv()
 
-    url = os.getenv("API_URL")
-    payload = {'auth': os.getenv("API_AUTH_KEY"), 'sr': 'memes', 'top': '20'}
-    response = requests.post(url, data=payload)
+    try:
+        url = os.getenv("API_URL")
+        auth = os.getenv("API_AUTH_KEY")
+        req_str = f"{url}?auth={auth}&sr=memes&top=2"
 
-    if response.status_code == 200:
-        create_pdf_with_tables(extract_data_to_df(), 'telegram_report2.pdf')
+        response = requests.post(req_str)
+
+        if response.status_code == 200:
+            data = extract_data_to_df()
+            if data is not None:
+                create_pdf_with_tables(data, 'telegram_report.pdf')
+            else:
+                print("Data extraction failed.")
+        else:
+            print(f"API request failed with status code: {response.status_code}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
