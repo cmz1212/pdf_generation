@@ -23,7 +23,7 @@ def extract_data_to_df():
     # Execute SQL query
     today_date = datetime.today().date().strftime("%Y-%m-%d")
     sql = """
-            SELECT rank, post_title, media_url, ups_num, comments_num, 
+            SELECT rank, post_title, media_type, media_url, ups_num, comments_num, 
             comment_author_1, comment_score_1, comment_1,
             comment_author_2, comment_score_2, comment_2,
             comment_author_3, comment_score_3, comment_3
@@ -73,6 +73,7 @@ def create_pdf_with_tables(df, file_name):
     ]
 
     for index, row in df.iterrows():
+        media_type = df.loc[index, "media_type"]
         df_row_index = df.loc[[index], ["rank", "post_title", "media_url", "ups_num", "comments_num"]]
         df_row_index.columns = ["Rank", "Post", "URL", "No. of Votes", "No. of Comments"]
         df_row_index = df_row_index.T.reset_index()
@@ -92,10 +93,10 @@ def create_pdf_with_tables(df, file_name):
                 media_url = df_row_table_data[i][1]
                 image_width = inch * 2
                 image_height = inch * 1.5
-                try:
+                if media_type == "image":
                     img = Image(media_url, width=image_width, height=image_height)
                     df_row_table_data[i][1] = img
-                except:
+                else:
                     # If there's an error loading the image, convert the path to a clickable hyperlink
                     df_row_table_data[i][1] = Paragraph('<a href="%s">%s</a>' % (media_url, media_url),
                                                         getSampleStyleSheet()["BodyText"])
@@ -120,7 +121,7 @@ if __name__ == "__main__":
     try:
         url = os.getenv("API_URL")
         auth = os.getenv("API_AUTH_KEY")
-        req_str = f"{url}?auth={auth}&sr=memes&top=2"
+        req_str = f"{url}?auth={auth}&sr=memes&top=10"
 
         response = requests.post(req_str)
 
