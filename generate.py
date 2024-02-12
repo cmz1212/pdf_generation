@@ -121,7 +121,7 @@ if __name__ == "__main__":
     try:
         url = os.getenv("API_URL")
         auth = os.getenv("API_AUTH_KEY")
-        req_str = f"{url}?auth={auth}&sr=memes&top=10"
+        req_str = f"{url}?auth={auth}&sr=memes&top=20"
 
         response = requests.post(req_str)
 
